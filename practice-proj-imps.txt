@@ -1,5 +1,1 @@
-$env:MONGODB_URI=mongodb+srv://shreyash:shreyashpractice@practice-project.jwrhuvb.mongodb.net/?retryWrites=true&w=majority&appName=Practice-project
-
-
-16-code pass
-syxiorg55@gmail.com=unhl hevt tbia ufaq
+Download GO lang extensions before use
