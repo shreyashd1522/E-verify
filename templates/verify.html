@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: radial-gradient(circle at 30% 50%, #a259ff 0%, #181c24 70%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.13);
+            padding: 48px 36px 36px 36px;
+            max-width: 410px;
+            width: 100%;
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            text-align: center;
+            color: #181c24;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 28px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 20px 14px 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f7f7fa;
+            color: #181c24;
+            font-size: 1.08rem;
+            transition: border 0.2s, background 0.2s;
+            outline: none;
+        }
+        .form-input:focus {
+            background: #fff;
+            border: 1.5px solid #a259ff;
+        }
+        .form-label {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            color: #7a859e;
+            font-size: 1rem;
+            pointer-events: none;
+            background: transparent;
+            transition: 0.2s cubic-bezier(.4,0,.2,1);
+        }
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: 4px;
+            left: 12px;
+            font-size: 0.88rem;
+            color: #a259ff;
+            background: #fff;
+            padding: 0 4px;
+        }
+        button {
+            width: 100%;
+            background: #181c24;
+            color: #fff;
+            border: none;
+            padding: 18px 0;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px 0 #a259ff22;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+        button:hover {
+            background: #a259ff;
+            color: #fff;
+            transform: scale(1.03);
+            box-shadow: 0 4px 16px 0 #a259ff44;
+        }
+        .resend-btn {
+            background: #fff;
+            color: #a259ff;
+            border: 1.5px solid #a259ff;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+        .resend-btn:hover {
+            background: #a259ff;
+            color: #fff;
+        }
+        .message {
+            text-align: center;
+            margin: 18px 0 0 0;
+            font-size: 1.08rem;
+            color: #181c24;
+            min-height: 32px;
+        }
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(24,28,36,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader-overlay.active {
+            display: flex;
+        }
+        .lottie-success, .lottie-error {
+            display: none;
+            margin: 0 auto 12px auto;
+        }
+        .lottie-success.active, .lottie-error.active {
+            display: block;
+        }
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Email Verification</h2>
+        <form method="POST" action="/verify" id="verifyForm" autocomplete="off">
+            <div class="form-group">
+                <input type="email" id="email" name="email" class="form-input" required placeholder=" " autocomplete="off">
+                <label for="email" class="form-label">Email</label>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" name="password" class="form-input" required placeholder=" " autocomplete="off">
+                <label for="password" class="form-label">Password</label>
+            </div>
+            <button type="submit">Send Verification Email</button>
+            <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                <a href="/forgot-password" style="font-size:0.98rem; color:#7a859e; text-decoration:underline; cursor:pointer;">Forgot password?</a>
+            </div>
+        </form>
+        <div class="message" id="message">{{.Message}}</div>
+        <button class="resend-btn" id="resendBtn" style="display:none;">Resend Verification Email</button>
+        <div class="lottie-success" id="successAnim">
+            <lottie-player
+                src="/animations/greencheck.json"
+                background="transparent"
+                speed="1"
+                style="width: 100px; height: 100px; background: transparent; border: none;"
+                loop
+                autoplay
+            ></lottie-player>
+        </div>
+        <div class="lottie-error" id="errorAnim">
+            <lottie-player
+                src="/animations/redcross.json"
+                background="transparent"
+                speed="1"
+                style="width: 100px; height: 100px;"
+                loop
+                autoplay
+            ></lottie-player>
+        </div>
+    </div>
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-content">
+            <lottie-player
+                src="/animations/loading.json"
+                background="transparent"
+                speed="1"
+                style="width: 160px; height: 160px;"
+                loop
+                autoplay
+            ></lottie-player>
+            <div id="timer" style="color:#fff; font-size:1rem; margin-top:8px; text-align:center; font-weight:600; letter-spacing:1px;">180s remaining</div>
+        </div>
+    </div>
+    <script>
+        let pollInterval, timerTimeout, timerInterval;
+        function startVerificationPolling(email) {
+            let seconds = 180;
+            document.getElementById('loaderOverlay').classList.add('active');
+            document.getElementById('successAnim').classList.remove('active');
+            document.getElementById('errorAnim').classList.remove('active');
+            document.getElementById('message').textContent = 'Waiting for email verification...';
+            document.getElementById('timer').textContent = seconds + 's remaining';
+
+            timerInterval = setInterval(function() {
+                seconds--;
+                document.getElementById('timer').textContent = seconds + 's remaining';
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+
+            pollInterval = setInterval(function() {
+                fetch('/check-verified?email=' + encodeURIComponent(email))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.verified) {
+                            clearInterval(pollInterval);
+                            clearTimeout(timerTimeout);
+                            clearInterval(timerInterval);
+                            document.getElementById('loaderOverlay').classList.remove('active');
+                            document.getElementById('successAnim').classList.add('active');
+                            document.getElementById('errorAnim').classList.remove('active');
+                            document.getElementById('message').textContent = 'Email is verified successfully!';
+                        } else if (data.expired) {
+                            clearInterval(pollInterval);
+                            clearTimeout(timerTimeout);
+                            clearInterval(timerInterval);
+                            document.getElementById('loaderOverlay').classList.remove('active');
+                            document.getElementById('successAnim').classList.remove('active');
+                            document.getElementById('errorAnim').classList.add('active');
+                            document.getElementById('message').textContent = 'Email verification failed.';
+                        }
+                    });
+            }, 5000);
+
+            timerTimeout = setTimeout(function() {
+                clearInterval(pollInterval);
+                clearInterval(timerInterval);
+                document.getElementById('loaderOverlay').classList.remove('active');
+                document.getElementById('successAnim').classList.remove('active');
+                document.getElementById('errorAnim').classList.add('active');
+                document.getElementById('message').textContent = 'Email verification failed.';
+            }, 180000); // 180 seconds
+        }
+
+        document.getElementById('verifyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            document.getElementById('successAnim').classList.remove('active');
+            document.getElementById('errorAnim').classList.remove('active');
+            document.getElementById('message').textContent = '';
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                const msg = data.message || '';
+                // Only show loader if not an immediate error or already verified
+                if (msg !== 'Incorrect password.' && msg !== 'Your email is already verified!') {
+                    document.getElementById('loaderOverlay').classList.add('active');
+                } else {
+                    document.getElementById('loaderOverlay').classList.remove('active');
+                }
+                document.getElementById('message').textContent = msg;
+                if (msg === 'Your email is already verified!') {
+                    document.getElementById('successAnim').classList.add('active');
+                    document.getElementById('errorAnim').classList.remove('active');
+                    document.getElementById('message').style.color = '#2ecc40';
+                } else if (msg === 'Incorrect password.') {
+                    document.getElementById('successAnim').classList.remove('active');
+                    document.getElementById('errorAnim').classList.add('active');
+                    document.getElementById('message').style.color = '#e74c3c';
+                    document.getElementById('message').textContent = 'Incorrect password, please enter your password again.';
+                } else {
+                    document.getElementById('successAnim').classList.remove('active');
+                    document.getElementById('errorAnim').classList.remove('active');
+                    document.getElementById('message').style.color = '#181c24';
+                }
+                // Only start polling if not an immediate error or already verified
+                if (msg !== 'Incorrect password.' && msg !== 'Your email is already verified!') {
+                    startVerificationPolling(email);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

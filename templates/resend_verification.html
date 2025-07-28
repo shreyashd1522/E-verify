@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resend Verification Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; background: #181c24; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 400px; margin: 60px auto; background: #23283a; border-radius: 18px; box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37); padding: 40px 32px 32px 32px; animation: fadeIn 1s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { text-align: center; color: #fff; margin-bottom: 28px; font-weight: 600; letter-spacing: 1px; }
+        label { display: block; margin-bottom: 8px; color: #bfc9d9; font-weight: 500; }
+        input[type="email"] { width: 100%; padding: 12px 14px; margin-bottom: 20px; border: none; border-radius: 8px; background: #23283a; color: #fff; font-size: 1rem; box-shadow: 0 0 0 1.5px #353b4b; transition: box-shadow 0.2s, background 0.2s; }
+        input[type="email"]:focus { outline: none; background: #23283a; box-shadow: 0 0 0 2.5px #4f8cff, 0 0 8px #4f8cff44; }
+        button { width: 100%; background: linear-gradient(90deg, #4f8cff 0%, #6a5cff 100%); color: #fff; border: none; padding: 14px 0; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px 0 #4f8cff33; transition: background 0.2s, transform 0.15s; margin-top: 8px; letter-spacing: 0.5px; animation: buttonPop 0.7s cubic-bezier(.68,-0.55,.27,1.55); }
+        button:hover { background: linear-gradient(90deg, #6a5cff 0%, #4f8cff 100%); transform: scale(1.04); box-shadow: 0 4px 16px 0 #4f8cff55; }
+        @keyframes buttonPop { 0% { transform: scale(0.95); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .footer { text-align: center; margin-top: 22px; color: #7a859e; font-size: 0.98rem; }
+        .footer a { color: #4f8cff; text-decoration: none; font-weight: 500; }
+        .footer a:hover { text-decoration: underline; }
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(24,28,36,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .loader-overlay.active { display: flex; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Resend Verification Email</h2>
+        <form method="POST" action="/resend-verification" id="resendForm">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Resend Email</button>
+        </form>
+        <div class="footer">
+            <a href="/login">Back to Login</a>
+        </div>
+    </div>
+    <div class="loader-overlay" id="loaderOverlay">
+        <lottie-player src="/animations/loading.json" background="transparent" speed="1" style="width: 80px; height: 80px;" loop autoplay></lottie-player>
+    </div>
+    <script>
+        document.getElementById('resendForm').addEventListener('submit', function() {
+            document.getElementById('loaderOverlay').classList.add('active');
+        });
+    </script>
+</body>
+</html> 
